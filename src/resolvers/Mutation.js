@@ -19,8 +19,8 @@ const Mutation = {
     const user = db.users.find((user) => user.id === id);
     if (!user) throw new Error('User Not Found');
     if (typeof email === 'string') {
-      const emailTaken = db.users.some(user => user.email === email);
-      if(emailTaken) throw new Error('Email already taken');
+      const emailTaken = db.users.some((user) => user.email === email);
+      if (emailTaken) throw new Error('Email already taken');
       user.email = email;
     }
     if (typeof name === 'string') {
@@ -60,6 +60,22 @@ const Mutation = {
     };
     db.posts.push(newPost);
     return newPost;
+  },
+  updatePost(parent, args, { db }, info) {
+    const { id, data } = args;
+    const { title, body, published } = data;
+    const post = db.posts.find((p) => p.id === id);
+    if (!post) throw new Error('Post Not Found');
+    if (typeof title === 'string') {
+      post.title = title;
+    }
+    if (typeof body === 'string') {
+      post.body = body;
+    }
+    if (typeof published === 'boolean') {
+      post.published = published;
+    }
+    return post;
   },
   deletePost(parent, args, { db }, info) {
     const { id } = args;
