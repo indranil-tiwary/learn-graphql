@@ -13,6 +13,24 @@ const Mutation = {
     db.users.push(newUser);
     return newUser;
   },
+  updateUser(parent, args, { db }, info) {
+    const { id, data } = args;
+    const { email, name, age } = data;
+    const user = db.users.find((user) => user.id === id);
+    if (!user) throw new Error('User Not Found');
+    if (typeof email === 'string') {
+      const emailTaken = db.users.some(user => user.email === email);
+      if(emailTaken) throw new Error('Email already taken');
+      user.email = email;
+    }
+    if (typeof name === 'string') {
+      user.name = name;
+    }
+    if (typeof age !== 'undefined') {
+      user.age = age;
+    }
+    return user;
+  },
   deleteUser(parent, args, { db }, info) {
     const { id } = args;
     const userIdx = db.users.findIndex((user) => user.id === id);
