@@ -100,6 +100,16 @@ const Mutation = {
     db.comments.push(comment);
     return comment;
   },
+  updateComment(parent, args, { db }, info) {
+    const { id, data } = args;
+    const { text } = data;
+    const comment = db.comments.find((c) => c.id === id);
+    if (!comment) throw new Error('Post Not Found');
+    if (typeof text === 'string') {
+      comment.text = text;
+    }
+    return comment;
+  },
   deleteComment(parent, args, { db }, info) {
     const { id } = args;
     const commentIdx = db.comments.findIndex((c) => c.id === id);
