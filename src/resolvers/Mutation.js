@@ -1,17 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 
 const Mutation = {
-  createUser(parent, args, { db }, info) {
-    const { data } = args;
-    const { email } = data;
-    const emailTaken = db.users.some((user) => user.email === email);
-    if (emailTaken) throw new Error('Email Taken');
-    const newUser = {
-      id: uuidv4(),
-      ...data,
-    };
-    db.users.push(newUser);
-    return newUser;
+  async createUser(parent, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
+
+    if(emailTaken) {
+      throw new Error('Email taken');
+    }
+
+    const user = await prisma.mutation.createUser({ data: args.data }, info);
+
+    return user;
   },
   updateUser(parent, args, { db }, info) {
     const { id, data } = args;
@@ -31,23 +30,24 @@ const Mutation = {
     }
     return user;
   },
-  deleteUser(parent, args, { db }, info) {
-    const { id } = args;
-    const userIdx = db.users.findIndex((user) => user.id === id);
-    if (userIdx < 0) throw new Error('User Not Found');
-    const deletedUser = db.users.splice(userIdx, 1);
+  deleteUser(parent, args, { prisma }, info) {
+    
+    // const { id } = args;
+    // const userIdx = db.users.findIndex((user) => user.id === id);
+    // if (userIdx < 0) throw new Error('User Not Found');
+    // const deletedUser = db.users.splice(userIdx, 1);
 
-    db.posts = db.posts.filter((post) => {
-      const match = post.author === id;
-      if (match) {
-        db.comments = db.comments.filter((comment) => comment.post !== post.id);
-      }
-      return !match;
-    });
+    // db.posts = db.posts.filter((post) => {
+    //   const match = post.author === id;
+    //   if (match) {
+    //     db.comments = db.comments.filter((comment) => comment.post !== post.id);
+    //   }
+    //   return !match;
+    // });
 
-    db.comments = db.comments.filter((comment) => comment.author !== id);
+    // db.comments = db.comments.filter((comment) => comment.author !== id);
 
-    return deletedUser[0];
+    // return deletedUser[0];
   },
   createPost(parent, args, { db, pubsub }, info) {
     const { data } = args;
