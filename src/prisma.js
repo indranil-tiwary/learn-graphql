@@ -5,6 +5,8 @@ const prisma = new Prisma({
   endpoint: "http://localhost:4466",
 });
 
+export { prisma as default };
+
 // const createPostForUser = async (authorId, data) => {
 //   const userExists = await prisma.exists.User({ id: authorId });
 
